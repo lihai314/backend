@@ -1,0 +1,25 @@
+import logging
+
+from app.core.config import Settings
+from app.core.logging import configure_logging
+
+
+def test_settings_defines_default_log_level() -> None:
+    settings = Settings()
+
+    assert settings.log_level == "INFO"
+
+
+def test_configure_logging_uses_standard_logging() -> None:
+    root_logger = logging.getLogger()
+    original_handlers = root_logger.handlers[:]
+    original_level = root_logger.level
+
+    try:
+        configure_logging("DEBUG")
+
+        assert root_logger.level == logging.DEBUG
+        assert any(isinstance(handler, logging.StreamHandler) for handler in root_logger.handlers)
+    finally:
+        root_logger.handlers = original_handlers
+        root_logger.setLevel(original_level)
