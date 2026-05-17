@@ -8,7 +8,11 @@ from app.core.logging import configure_logging
 def create_app() -> FastAPI:
     settings = get_settings()
     configure_logging(settings.log_level)
-    application = FastAPI(title=settings.app_name)
+    application = FastAPI(
+        title="Backend API",
+        description="Backend service API",
+        version="0.1.0",
+    )
     application.include_router(api_router)
     return application
 
