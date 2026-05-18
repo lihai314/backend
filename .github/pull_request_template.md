@@ -6,6 +6,11 @@
 
 -
 
+- [ ] 已本地执行 `uv run ruff check .`
+- [ ] 已本地执行 `uv run mypy src`
+- [ ] 已本地执行 `uv run pytest`
+- [ ] 如涉及 Docker，已确认 `docker build -t backend:local .`
+
 ## 影响范围
 
 -
