@@ -22,6 +22,7 @@
 - [ ] API 变更，已确认 `/docs` 和 `/openapi.json`
 - [ ] 请求 / 响应 Schema 变更已说明
 - [ ] 错误码 / 状态码变更已说明
+- [ ] 错误响应仍符合 `code` / `message` / `data` 结构
 - [ ] 依赖变更，已更新 `uv.lock`
 - [ ] Docker 变更
 - [ ] 测试变更

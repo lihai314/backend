@@ -202,3 +202,69 @@ PR 中必须说明以下变更：
 5. 不兼容变更及其影响范围
 
 面向前端或外部系统的接口变更必须提前同步。
+
+## 11. 异常响应
+
+所有错误响应统一使用：
+
+```json
+{
+  "code": "ERROR_CODE",
+  "message": "Error message",
+  "data": null
+}
+```
+
+参数校验错误使用：
+
+```json
+{
+  "code": "VALIDATION_ERROR",
+  "message": "Invalid request payload",
+  "data": {
+    "details": []
+  }
+}
+```
+
+### 11.1 HTTP 状态码
+
+错误响应必须保留正确 HTTP 状态码，不允许所有错误都返回 200。
+
+基础映射：
+
+- `400` -> `BAD_REQUEST`
+- `401` -> `UNAUTHORIZED`
+- `403` -> `FORBIDDEN`
+- `404` -> `NOT_FOUND`
+- `409` -> `CONFLICT`
+- `422` -> `VALIDATION_ERROR`
+- `500` -> `INTERNAL_SERVER_ERROR`
+
+### 11.2 422 校验错误
+
+FastAPI 的 422 参数校验错误由统一异常处理器接管。
+
+校验详情保留在：
+
+```json
+{
+  "data": {
+    "details": []
+  }
+}
+```
+
+### 11.3 未捕获异常
+
+未捕获异常统一返回：
+
+```json
+{
+  "code": "INTERNAL_SERVER_ERROR",
+  "message": "Internal server error",
+  "data": null
+}
+```
+
+生产环境不得向客户端暴露 traceback、数据库错误、内部异常消息或敏感信息。
