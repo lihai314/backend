@@ -30,17 +30,61 @@ cp .env.example .env
 
 应用层统一使用 Python 标准库 `logging`，通过 `LOG_LEVEL` 控制日志级别。暂不引入 `loguru`、`structlog` 或其他第三方日志框架；长期日志禁止使用 `print`。
 
-## 运行服务
+## 本地开发
+
+### 1. 安装依赖
+
+```bash
+uv sync
+```
+
+### 2. 准备环境变量
+
+```bash
+cp .env.example .env
+```
+
+默认本地数据库连接：
+
+```env
+DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/backend
+```
+
+### 3. 启动 PostgreSQL
+
+```bash
+docker compose up -d postgres
+```
+
+### 4. 执行数据库迁移
+
+```bash
+uv run alembic upgrade head
+```
+
+### 5. 启动后端服务
 
 ```bash
 uv run uvicorn app.main:app --reload
 ```
 
-启动后可访问：
+默认访问：
 
 - 健康检查：`http://127.0.0.1:8000/health`
-- OpenAPI 文档：`http://127.0.0.1:8000/docs`
-- OpenAPI JSON：`http://127.0.0.1:8000/openapi.json`
+- API 文档：`http://localhost:8000/docs`
+- OpenAPI JSON：`http://localhost:8000/openapi.json`
+
+### 6. 停止本地依赖
+
+```bash
+docker compose down
+```
+
+如需清理本地数据库数据：
+
+```bash
+docker compose down -v
+```
 
 ## Docker
 
