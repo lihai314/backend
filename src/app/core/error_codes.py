@@ -1,7 +1,11 @@
+"""错误码枚举，定义全局统一业务错误码。"""
+
 from enum import StrEnum
 
 
 class ErrorCode(StrEnum):
+    """统一业务错误码枚举，与 HTTP 状态码对应但不直接耦合。"""
+
     OK = "OK"
     BAD_REQUEST = "BAD_REQUEST"
     VALIDATION_ERROR = "VALIDATION_ERROR"

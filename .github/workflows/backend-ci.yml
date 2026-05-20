@@ -1,3 +1,5 @@
+# Backend CI — 代码质量检查与 Docker 构建
+# 触发条件：PR 到 main / Push 到 main
 name: Backend CI
 
 on:
@@ -9,18 +11,20 @@ on:
       - main
 
 jobs:
+  # 代码质量检查：ruff、mypy、pytest
   quality:
     name: Quality checks
     runs-on: ubuntu-latest
     env:
       APP_NAME: backend
       ENVIRONMENT: test
+      LOG_LEVEL: DEBUG
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -31,15 +35,16 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen
 
-      - name: Run ruff
+      - name: Run ruff (代码规范检查)
         run: uv run ruff check .
 
-      - name: Run mypy
+      - name: Run mypy (静态类型检查)
         run: uv run mypy src
 
-      - name: Run pytest
+      - name: Run pytest (单元测试)
         run: uv run pytest
 
+  # Docker 构建验证
   docker:
     name: Docker build
     runs-on: ubuntu-latest
