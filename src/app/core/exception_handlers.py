@@ -1,0 +1,117 @@
+import logging
+from typing import Any, cast
+
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from starlette.types import ExceptionHandler
+
+from app.core.error_codes import ErrorCode
+from app.core.exceptions import AppException
+
+logger = logging.getLogger(__name__)
+
+
+def error_response(
+    *,
+    status_code: int,
+    code: ErrorCode | str,
+    message: str,
+    data: Any | None = None,
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=status_code,
+        content={
+            "code": str(code),
+            "message": message,
+            "data": data,
+        },
+    )
+
+
+def map_status_code_to_error_code(status_code: int) -> ErrorCode:
+    if status_code == 401:
+        return ErrorCode.UNAUTHORIZED
+    if status_code == 403:
+        return ErrorCode.FORBIDDEN
+    if status_code == 404:
+        return ErrorCode.NOT_FOUND
+    if status_code == 409:
+        return ErrorCode.CONFLICT
+    if status_code == 422:
+        return ErrorCode.VALIDATION_ERROR
+    if status_code >= 500:
+        return ErrorCode.INTERNAL_SERVER_ERROR
+    return ErrorCode.BAD_REQUEST
+
+
+def default_message_for_status_code(status_code: int) -> str:
+    if status_code == 400:
+        return "Bad request"
+    if status_code == 401:
+        return "Unauthorized"
+    if status_code == 403:
+        return "Forbidden"
+    if status_code == 404:
+        return "Not found"
+    if status_code == 409:
+        return "Conflict"
+    if status_code == 422:
+        return "Invalid request payload"
+    if status_code >= 500:
+        return "Internal server error"
+    return "Request failed"
+
+
+async def app_exception_handler(request: Request, exc: AppException) -> JSONResponse:
+    return error_response(
+        status_code=exc.status_code,
+        code=exc.code,
+        message=exc.message,
+        data=exc.data,
+    )
+
+
+async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
+    code = map_status_code_to_error_code(exc.status_code)
+    message = str(exc.detail) if exc.detail else default_message_for_status_code(exc.status_code)
+
+    return error_response(
+        status_code=exc.status_code,
+        code=code,
+        message=message,
+        data=None,
+    )
+
+
+async def validation_exception_handler(
+    request: Request,
+    exc: RequestValidationError,
+) -> JSONResponse:
+    return error_response(
+        status_code=422,
+        code=ErrorCode.VALIDATION_ERROR,
+        message="Invalid request payload",
+        data={"details": exc.errors()},
+    )
+
+
+async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    logger.exception("Unhandled exception occurred", exc_info=exc)
+
+    return error_response(
+        status_code=500,
+        code=ErrorCode.INTERNAL_SERVER_ERROR,
+        message="Internal server error",
+        data=None,
+    )
+
+
+def register_exception_handlers(app: FastAPI) -> None:
+    app.add_exception_handler(AppException, cast(ExceptionHandler, app_exception_handler))
+    app.add_exception_handler(HTTPException, cast(ExceptionHandler, http_exception_handler))
+    app.add_exception_handler(
+        RequestValidationError,
+        cast(ExceptionHandler, validation_exception_handler),
+    )
+    app.add_exception_handler(Exception, unhandled_exception_handler)
