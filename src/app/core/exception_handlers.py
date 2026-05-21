@@ -1,3 +1,5 @@
+"""全局异常处理器，将各类异常统一转换为标准 JSON 响应格式。"""
+
 import logging
 from typing import Any, cast
 
@@ -19,6 +21,7 @@ def error_response(
     message: str,
     data: Any | None = None,
 ) -> JSONResponse:
+    """构建统一格式的错误 JSON 响应。"""
     return JSONResponse(
         status_code=status_code,
         content={
@@ -30,6 +33,7 @@ def error_response(
 
 
 def map_status_code_to_error_code(status_code: int) -> ErrorCode:
+    """将 HTTP 状态码映射为对应的业务错误码。"""
     if status_code == 401:
         return ErrorCode.UNAUTHORIZED
     if status_code == 403:
@@ -46,6 +50,7 @@ def map_status_code_to_error_code(status_code: int) -> ErrorCode:
 
 
 def default_message_for_status_code(status_code: int) -> str:
+    """根据 HTTP 状态码返回默认错误消息。"""
     if status_code == 400:
         return "Bad request"
     if status_code == 401:
@@ -64,6 +69,7 @@ def default_message_for_status_code(status_code: int) -> str:
 
 
 async def app_exception_handler(request: Request, exc: AppException) -> JSONResponse:
+    """处理自定义 AppException 业务异常。"""
     return error_response(
         status_code=exc.status_code,
         code=exc.code,
@@ -73,6 +79,7 @@ async def app_exception_handler(request: Request, exc: AppException) -> JSONResp
 
 
 async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
+    """处理 Starlette/FastAPI 原生 HTTPException。"""
     code = map_status_code_to_error_code(exc.status_code)
     message = str(exc.detail) if exc.detail else default_message_for_status_code(exc.status_code)
 
@@ -88,6 +95,7 @@ async def validation_exception_handler(
     request: Request,
     exc: RequestValidationError,
 ) -> JSONResponse:
+    """处理请求体校验失败异常（422），返回详细验证错误信息。"""
     return error_response(
         status_code=422,
         code=ErrorCode.VALIDATION_ERROR,
@@ -97,6 +105,7 @@ async def validation_exception_handler(
 
 
 async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    """兜底异常处理器，捕获所有未预期的异常并记录错误日志。"""
     logger.exception("Unhandled exception occurred", exc_info=exc)
 
     return error_response(
@@ -108,6 +117,7 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
 
 
 def register_exception_handlers(app: FastAPI) -> None:
+    """向 FastAPI 应用注册所有自定义异常处理器。"""
     app.add_exception_handler(AppException, cast(ExceptionHandler, app_exception_handler))
     app.add_exception_handler(HTTPException, cast(ExceptionHandler, http_exception_handler))
     app.add_exception_handler(

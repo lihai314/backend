@@ -1,4 +1,5 @@
 services:
+  # PostgreSQL 数据库服务
   postgres:
     image: postgres:16-alpine
     container_name: backend-postgres
@@ -18,4 +19,5 @@ services:
       retries: 10
 
 volumes:
+  # PostgreSQL 数据持久化卷
   postgres_data:
