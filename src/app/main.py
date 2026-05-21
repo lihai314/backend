@@ -1,3 +1,5 @@
+"""应用工厂模块，负责创建并配置 FastAPI 应用实例。"""
+
 from fastapi import FastAPI
 
 from app.api.router import api_router
@@ -7,6 +9,7 @@ from app.core.logging import configure_logging
 
 
 def create_app() -> FastAPI:
+    """创建 FastAPI 应用实例，依次完成配置加载、日志初始化、异常处理器注册和路由挂载。"""
     settings = get_settings()
     configure_logging(settings.log_level)
     application = FastAPI(
