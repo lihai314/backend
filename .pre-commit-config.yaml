@@ -1,0 +1,26 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format
+        language: system
+        files: ^(src|tests)/.*\.py$
+
+      - id: ruff-check
+        name: ruff lint
+        entry: uv run ruff check --fix
+        language: system
+        files: ^(src|tests)/.*\.py$
+
+      - id: mypy
+        name: mypy type check
+        entry: uv run mypy src
+        language: system
+        pass_filenames: false
+
+      - id: pytest-cov
+        name: pytest with coverage
+        entry: uv run pytest --cov=app --cov-report=term-missing
+        language: system
+        pass_filenames: false
