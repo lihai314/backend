@@ -1,6 +1,8 @@
+# 版本控制
 .git
 .github
 
+# 缓存与虚拟环境
 .mypy_cache
 .pytest_cache
 .ruff_cache
@@ -11,16 +13,20 @@ __pycache__
 .coverage
 htmlcov
 
+# 环境变量文件
 .env
 .env.*
 !.env.example
 
+# 操作系统与 IDE
 .DS_Store
 .idea
 .vscode
 
+# 日志
 *.log
 
+# 发行包与构建产物
 dist
 build
 *.egg-info

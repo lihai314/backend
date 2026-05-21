@@ -1,4 +1,4 @@
-# Python
+# Python 编译产物与缓存
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -7,23 +7,24 @@ __pycache__/
 .coverage
 htmlcov/
 
-# Virtual env
+# 虚拟环境
 .venv/
 venv/
 
-# Env
+# 环境变量文件
 .env
 .env.*
 !.env.example
 
-# OS / IDE
+# 操作系统与 IDE
 .DS_Store
 .idea/
 .vscode/
 
-# Logs
+# 日志
 *.log
 
+# 发行包与构建产物
 dist/
 build/
 *.egg-info/

@@ -1,24 +1,29 @@
+# 本地 pre-commit hooks 配置
 repos:
   - repo: local
     hooks:
+      # 代码格式化
       - id: ruff-format
         name: ruff format
         entry: uv run ruff format
         language: system
         files: ^(src|tests)/.*\.py$
 
+      # 代码规范检查（自动修复）
       - id: ruff-check
         name: ruff lint
         entry: uv run ruff check --fix
         language: system
         files: ^(src|tests)/.*\.py$
 
+      # 静态类型检查
       - id: mypy
         name: mypy type check
         entry: uv run mypy src
         language: system
         pass_filenames: false
 
+      # 单元测试与覆盖率
       - id: pytest-cov
         name: pytest with coverage
         entry: uv run pytest --cov=app --cov-report=term-missing

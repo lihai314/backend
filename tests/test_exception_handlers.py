@@ -1,3 +1,5 @@
+"""全局异常处理器测试，验证各类异常均返回统一 JSON 响应格式。"""
+
 from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
@@ -7,10 +9,13 @@ from app.core.exceptions import NotFoundException
 
 
 class Payload(BaseModel):
+    """请求体测试模型。"""
+
     name: str
 
 
 def create_test_app() -> FastAPI:
+    """创建用于异常处理测试的 FastAPI 应用实例。"""
     app = FastAPI()
     register_exception_handlers(app)
 
@@ -34,6 +39,7 @@ def create_test_app() -> FastAPI:
 
 
 def test_app_exception_uses_unified_response() -> None:
+    """验证自定义业务异常返回统一格式响应。"""
     client = TestClient(create_test_app())
 
     response = client.get("/app-exception")
@@ -47,6 +53,7 @@ def test_app_exception_uses_unified_response() -> None:
 
 
 def test_http_exception_uses_unified_response() -> None:
+    """验证 HTTPException 返回统一格式响应。"""
     client = TestClient(create_test_app())
 
     response = client.get("/http-exception")
@@ -60,6 +67,7 @@ def test_http_exception_uses_unified_response() -> None:
 
 
 def test_validation_exception_uses_unified_response() -> None:
+    """验证请求体校验失败返回详细验证错误信息。"""
     client = TestClient(create_test_app())
 
     response = client.post("/validation", json={})
@@ -73,6 +81,7 @@ def test_validation_exception_uses_unified_response() -> None:
 
 
 def test_unhandled_exception_hides_internal_details() -> None:
+    """验证未预期异常隐藏内部细节，不泄露敏感信息。"""
     client = TestClient(create_test_app(), raise_server_exceptions=False)
 
     response = client.get("/unhandled")
