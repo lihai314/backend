@@ -121,6 +121,20 @@ uv run alembic upgrade head
 
 ## 质量检查
 
+安装本地 Git hooks：
+
+```bash
+make hooks-install
+```
+
+提交前可手动执行全量 hooks：
+
+```bash
+make hooks-run
+```
+
+本地 hooks 会依次执行 Ruff 格式化、Ruff lint 自动修复、mypy 类型检查和带覆盖率的 pytest。
+
 运行测试：
 
 ```bash
@@ -137,4 +151,15 @@ uv run ruff check .
 
 ```bash
 uv run mypy src
+```
+
+也可以使用 Makefile 统一入口：
+
+```bash
+make format
+make lint
+make type-check
+make test
+make test-cov
+make check
 ```
