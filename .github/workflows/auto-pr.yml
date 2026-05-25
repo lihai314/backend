@@ -1,0 +1,46 @@
+# 自动创建 Pull Request
+# 触发条件：推送非 main 分支到远程仓库时自动创建 PR
+name: Auto PR
+
+on:
+  push:
+    branches:
+      - "feat/**"
+      - "fix/**"
+      - "chore/**"
+      - "refactor/**"
+      - "docs/**"
+
+permissions:
+  pull-requests: write
+
+jobs:
+  create-pr:
+    name: Auto create pull request
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+
+          # 检查是否已存在同名 PR，避免重复创建
+          EXISTING=$(gh pr list --head "$BRANCH_NAME" --state open --json number --jq '.[0].number')
+          if [ -n "$EXISTING" ]; then
+            echo "PR #$EXISTING 已存在，跳过创建"
+            exit 0
+          fi
+
+          # 从分支名提取类型前缀作为 PR 标题前缀
+          # 例如 feat/add-login → "feat: add-login"
+          PR_TITLE="${BRANCH_NAME%%/*}: ${BRANCH_NAME#*/}"
+
+          gh pr create \
+            --base main \
+            --title "$PR_TITLE" \
+            --body "自动创建的 Pull Request，分支：\`${BRANCH_NAME}\`"
