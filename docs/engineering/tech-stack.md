@@ -9,7 +9,7 @@
 - 数据库：PostgreSQL
 - ORM / 数据访问层：SQLAlchemy 2.0
 - 数据库迁移：Alembic
-- 缓存：暂不配置
+- 缓存：Redis
 - 消息队列：暂不配置
 - API 风格：REST
 - API 文档方案：FastAPI 内置 OpenAPI，暴露 `/docs` 和 `/openapi.json`
@@ -95,9 +95,7 @@ migration 文件必须提交到 Git。
 
 ## 7. 缓存约定
 
-当前不配置缓存。
-
-Redis 不作为默认依赖。
+当前本地开发环境通过 Docker Compose 提供 Redis。
 
 只有出现明确场景时才允许引入缓存，例如：
 

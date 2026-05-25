@@ -27,6 +27,7 @@ cp .env.example .env
 ```
 
 根据本地 PostgreSQL 修改 `.env` 中的 `DATABASE_URL`。
+如需使用 Redis，可修改 `.env` 中的 `REDIS_URL`。
 
 应用层统一使用 Python 标准库 `logging`，通过 `LOG_LEVEL` 控制日志级别。暂不引入 `loguru`、`structlog` 或其他第三方日志框架；长期日志禁止使用 `print`。
 
@@ -56,6 +57,12 @@ DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/backend
 docker compose up -d postgres
 ```
 
+如需同时启动 Redis：
+
+```bash
+docker compose up -d postgres redis
+```
+
 ### 4. 执行数据库迁移
 
 ```bash
@@ -70,7 +77,7 @@ uv run uvicorn app.main:app --reload
 
 默认访问：
 
-- 健康检查：`http://127.0.0.1:8000/health`
+- 健康检查：`http://127.0.0.1:8000/api/v1/health`
 - API 文档：`http://localhost:8000/docs`
 - OpenAPI JSON：`http://localhost:8000/openapi.json`
 
@@ -88,6 +95,20 @@ docker compose down -v
 
 ## Docker
 
+构建、启动、联调、测试并自动清理本地 Docker 资源：
+
+```bash
+make docker-local-check
+```
+
+该命令会启动后端、PostgreSQL 和 Redis，检查健康接口、API 文档、Redis、PostgreSQL、Compose 配置、mypy 和 pytest，结束后自动删除容器、网络、数据卷和临时镜像 `backend:local-check`。如果本地不存在 `.env`，会临时使用 `.env.example` 生成，并在结束后删除；如果 PostgreSQL、Redis、Python 或 uv 基础镜像是本次命令新拉取的，也会自动删除。
+
+一键启动后端、PostgreSQL 和 Redis：
+
+```bash
+docker compose up -d --build
+```
+
 构建镜像：
 
 ```bash
@@ -102,7 +123,7 @@ docker run --rm -p 8000:8000 --env-file .env backend:local
 
 容器启动后可访问：
 
-- 健康检查：`http://127.0.0.1:8000/health`
+- 健康检查：`http://127.0.0.1:8000/api/v1/health`
 - OpenAPI 文档：`http://127.0.0.1:8000/docs`
 
 ## 数据库迁移

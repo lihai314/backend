@@ -132,9 +132,9 @@ docker build -t backend:local .
 - [ ] Dockerfile 仍使用 Python 3.11
 - [ ] Docker build 不依赖 `.env`
 - [ ] `.dockerignore` 排除了 `.env`、`.venv/`、缓存、日志和 Git 元数据
-- [ ] `docker-compose.yml` 当前只包含 PostgreSQL
+- [ ] `docker-compose.yml` 包含后端应用、PostgreSQL 和 Redis
 - [ ] README 本地开发流程仍可执行
-- [ ] 没有引入 Redis、消息队列、Nginx、Kubernetes、staging 或 CD
+- [ ] 没有额外引入消息队列、Nginx、Kubernetes、staging 或 CD
 
 ## 11. CI 检查
 
