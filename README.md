@@ -95,6 +95,14 @@ docker compose down -v
 
 ## Docker
 
+构建、启动、联调、测试并自动清理本地 Docker 资源：
+
+```bash
+make docker-local-check
+```
+
+该命令会启动后端、PostgreSQL 和 Redis，检查健康接口、API 文档、Redis、PostgreSQL、Compose 配置、mypy 和 pytest，结束后自动删除容器、网络、数据卷和临时镜像 `backend:local-check`。如果本地不存在 `.env`，会临时使用 `.env.example` 生成，并在结束后删除；如果 PostgreSQL、Redis、Python 或 uv 基础镜像是本次命令新拉取的，也会自动删除。
+
 一键启动后端、PostgreSQL 和 Redis：
 
 ```bash

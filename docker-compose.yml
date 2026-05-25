@@ -3,7 +3,7 @@ services:
   backend:
     build:
       context: .
-    image: backend:local
+    image: ${BACKEND_IMAGE:-backend:local}
     container_name: backend-api
     restart: unless-stopped
     env_file:
