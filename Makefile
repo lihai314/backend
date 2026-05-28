@@ -1,3 +1,9 @@
+PYTHON_BASE_IMAGE ?= python:3.11-slim
+UV_BASE_IMAGE ?= ghcr.io/astral-sh/uv:0.11.3
+
+export PYTHON_BASE_IMAGE
+export UV_BASE_IMAGE
+
 .PHONY: help install hooks-install hooks-run format lint lint-fix type-check test test-cov check docker-build docker-local-check
 
 help:
@@ -45,7 +51,10 @@ test-cov:
 check: lint type-check test
 
 docker-build:
-	docker build -t backend:local .
+	docker build \
+		--build-arg PYTHON_BASE_IMAGE=$(PYTHON_BASE_IMAGE) \
+		--build-arg UV_BASE_IMAGE=$(UV_BASE_IMAGE) \
+		-t backend:local .
 
 docker-local-check:
 	@set -e; \
@@ -56,16 +65,16 @@ docker-local-check:
 	uv_image_exists=0; \
 	docker image inspect postgres:16-alpine >/dev/null 2>&1 && postgres_image_exists=1 || true; \
 	docker image inspect redis:7-alpine >/dev/null 2>&1 && redis_image_exists=1 || true; \
-	docker image inspect python:3.11-slim >/dev/null 2>&1 && python_image_exists=1 || true; \
-	docker image inspect ghcr.io/astral-sh/uv:0.11.3 >/dev/null 2>&1 && uv_image_exists=1 || true; \
+	docker image inspect "$(PYTHON_BASE_IMAGE)" >/dev/null 2>&1 && python_image_exists=1 || true; \
+	docker image inspect "$(UV_BASE_IMAGE)" >/dev/null 2>&1 && uv_image_exists=1 || true; \
 	cleanup() { \
 		status=$$?; \
 		BACKEND_IMAGE=backend:local-check docker compose down -v --remove-orphans >/dev/null 2>&1 || true; \
 		docker image rm backend:local-check >/dev/null 2>&1 || true; \
 		if [ "$$postgres_image_exists" = "0" ]; then docker image rm postgres:16-alpine >/dev/null 2>&1 || true; fi; \
 		if [ "$$redis_image_exists" = "0" ]; then docker image rm redis:7-alpine >/dev/null 2>&1 || true; fi; \
-		if [ "$$python_image_exists" = "0" ]; then docker image rm python:3.11-slim >/dev/null 2>&1 || true; fi; \
-		if [ "$$uv_image_exists" = "0" ]; then docker image rm ghcr.io/astral-sh/uv:0.11.3 >/dev/null 2>&1 || true; fi; \
+		if [ "$$python_image_exists" = "0" ]; then docker image rm "$(PYTHON_BASE_IMAGE)" >/dev/null 2>&1 || true; fi; \
+		if [ "$$uv_image_exists" = "0" ]; then docker image rm "$(UV_BASE_IMAGE)" >/dev/null 2>&1 || true; fi; \
 		if [ "$$created_env" = "1" ]; then rm -f .env; fi; \
 		exit $$status; \
 	}; \

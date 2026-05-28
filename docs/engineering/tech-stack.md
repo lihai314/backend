@@ -32,7 +32,7 @@
 
 - `.python-version`：声明本地使用 Python 3.11
 - `pyproject.toml`：声明 `requires-python = ">=3.11,<3.12"`
-- `Dockerfile`：使用 `python:3.11-slim`
+- `Dockerfile`：默认使用 `python:3.11-slim`，可通过 `PYTHON_BASE_IMAGE` 覆盖基础镜像源
 
 ## 3. 配置管理约定
 
@@ -166,6 +166,8 @@ docker run --rm -p 8000:8000 --env-file .env backend:local
 ```
 
 Docker 镜像必须使用 Python 3.11 minor 版本。
+
+Dockerfile 使用多阶段构建：构建阶段安装依赖和当前项目包，运行阶段只保留生产虚拟环境。默认基础镜像可以覆盖，但覆盖后的镜像仍必须提供 Python 3.11；生产或发布构建建议使用带 digest 的镜像引用。
 
 ## 11. 新技术引入约定
 

@@ -115,6 +115,22 @@ docker compose up -d --build
 docker build -t backend:local .
 ```
 
+如果拉取 Docker Hub 的 `python:3.11-slim` 经常超时，可以指定可访问的 Python 基础镜像：
+
+```bash
+PYTHON_BASE_IMAGE=public.ecr.aws/docker/library/python:3.11-slim docker compose up -d --build
+```
+
+单独构建镜像时也可以使用相同参数：
+
+```bash
+docker build \
+  --build-arg PYTHON_BASE_IMAGE=public.ecr.aws/docker/library/python:3.11-slim \
+  -t backend:local .
+```
+
+如果 `ghcr.io/astral-sh/uv:0.11.3` 也不可访问，可以通过 `UV_BASE_IMAGE` 指定可访问的 uv 镜像源。生产或发布构建建议把 `PYTHON_BASE_IMAGE` 和 `UV_BASE_IMAGE` 指定为带 digest 的镜像引用，保证构建结果可复现。
+
 运行容器：
 
 ```bash

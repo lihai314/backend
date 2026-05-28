@@ -129,7 +129,7 @@ docker build -t backend:local .
 
 如果 PR 涉及 Docker 或本地开发流程，必须检查：
 
-- [ ] Dockerfile 仍使用 Python 3.11
+- [ ] Dockerfile 仍使用 Python 3.11，或通过 `PYTHON_BASE_IMAGE` 覆盖为 Python 3.11 基础镜像
 - [ ] Docker build 不依赖 `.env`
 - [ ] `.dockerignore` 排除了 `.env`、`.venv/`、缓存、日志和 Git 元数据
 - [ ] `docker-compose.yml` 包含后端应用、PostgreSQL 和 Redis

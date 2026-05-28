@@ -10,7 +10,7 @@ dependencies = [
     "psycopg[binary]>=3.2.0",  # PostgreSQL 异步驱动
     "pydantic-settings>=2.6.0",  # 配置管理
     "sqlalchemy>=2.0.0",  # ORM 框架
-    "uvicorn[standard]>=0.30.0",  # ASGI 服务器
+    "uvicorn>=0.30.0",  # ASGI 服务器
 ]
 
 [build-system]
