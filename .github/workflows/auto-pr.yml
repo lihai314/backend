@@ -40,7 +40,10 @@ jobs:
           # 例如 feat/add-login → "feat: add-login"
           PR_TITLE="${BRANCH_NAME%%/*}: ${BRANCH_NAME#*/}"
 
-          gh pr create \
+          if ! gh pr create \
             --base main \
             --title "$PR_TITLE" \
-            --body "自动创建的 Pull Request，分支：\`${BRANCH_NAME}\`"
+            --body "自动创建的 Pull Request，分支：\`${BRANCH_NAME}\`"; then
+            echo "::warning::自动创建 PR 失败，请检查仓库是否允许 GitHub Actions 创建 Pull Request"
+            exit 0
+          fi
