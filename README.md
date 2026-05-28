@@ -23,13 +23,43 @@ uv sync
 复制环境变量示例：
 
 ```bash
-cp .env.example .env
+[ -f .env ] || cp .env.example .env
 ```
 
 根据本地 PostgreSQL 修改 `.env` 中的 `DATABASE_URL`。
 如需使用 Redis，可修改 `.env` 中的 `REDIS_URL`。
 
 应用层统一使用 Python 标准库 `logging`，通过 `LOG_LEVEL` 控制日志级别。暂不引入 `loguru`、`structlog` 或其他第三方日志框架；长期日志禁止使用 `print`。
+
+## 常用命令
+
+项目脚本统一通过 Makefile 入口执行：
+
+```bash
+make help
+```
+
+常用本地命令：
+
+```bash
+make install
+make check
+make test-cov
+```
+
+常用 Docker 命令：
+
+```bash
+make docker-up
+make docker-ps
+make docker-health
+make docker-logs
+make docker-down
+```
+
+`make docker-down` 只停止并删除容器和网络，不删除 PostgreSQL / Redis 数据卷。需要清理数据卷时再手动执行 `docker compose down -v`。
+
+完整命令清单见 [项目命令与脚本](docs/engineering/commands.md)。
 
 ## 本地开发
 
@@ -42,7 +72,7 @@ uv sync
 ### 2. 准备环境变量
 
 ```bash
-cp .env.example .env
+[ -f .env ] || cp .env.example .env
 ```
 
 默认本地数据库连接：
@@ -54,14 +84,10 @@ DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/backend
 ### 3. 启动 PostgreSQL
 
 ```bash
-docker compose up -d postgres
+make docker-up
 ```
 
-如需同时启动 Redis：
-
-```bash
-docker compose up -d postgres redis
-```
+该命令会启动后端、PostgreSQL 和 Redis。如果只想启动数据库和 Redis，可执行 `docker compose up -d postgres redis`。
 
 ### 4. 执行数据库迁移
 
@@ -84,10 +110,10 @@ uv run uvicorn app.main:app --reload
 ### 6. 停止本地依赖
 
 ```bash
-docker compose down
+make docker-down
 ```
 
-如需清理本地数据库数据：
+如需清理本地数据库和 Redis 数据卷：
 
 ```bash
 docker compose down -v
@@ -101,12 +127,12 @@ docker compose down -v
 make docker-local-check
 ```
 
-该命令会启动后端、PostgreSQL 和 Redis，检查健康接口、API 文档、Redis、PostgreSQL、Compose 配置、mypy 和 pytest，结束后自动删除容器、网络、数据卷和临时镜像 `backend:local-check`。如果本地不存在 `.env`，会临时使用 `.env.example` 生成，并在结束后删除；如果 PostgreSQL、Redis、Python 或 uv 基础镜像是本次命令新拉取的，也会自动删除。
+该命令会使用独立 Compose 项目 `backend-local-check` 和独立端口启动后端、PostgreSQL 和 Redis，检查健康接口、API 文档、Redis、PostgreSQL、Compose 配置、mypy 和 pytest，结束后自动删除临时容器、网络、数据卷和临时镜像 `backend:local-check`。它不会删除当前本地开发环境的 `backend_postgres_data` 和 `backend_redis_data` 数据卷。
 
 一键启动后端、PostgreSQL 和 Redis：
 
 ```bash
-docker compose up -d --build
+make docker-up
 ```
 
 构建镜像：
@@ -115,17 +141,23 @@ docker compose up -d --build
 docker build -t backend:local .
 ```
 
-如果拉取 Docker Hub 的 `python:3.11-slim` 经常超时，可以指定可访问的 Python 基础镜像：
+也可以使用 Makefile：
 
 ```bash
-PYTHON_BASE_IMAGE=public.ecr.aws/docker/library/python:3.11-slim docker compose up -d --build
+make docker-build
+```
+
+如果拉取 Docker Hub 的 `python:3.11-slim` 经常超时，可以指定团队可访问的 Python 3.11 基础镜像：
+
+```bash
+PYTHON_BASE_IMAGE=<your-registry>/python:3.11-slim make docker-up
 ```
 
 单独构建镜像时也可以使用相同参数：
 
 ```bash
 docker build \
-  --build-arg PYTHON_BASE_IMAGE=public.ecr.aws/docker/library/python:3.11-slim \
+  --build-arg PYTHON_BASE_IMAGE=<your-registry>/python:3.11-slim \
   -t backend:local .
 ```
 

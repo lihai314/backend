@@ -63,15 +63,13 @@ Reviewer 需要重点看：
 - [ ] 作者已执行或 CI 已覆盖：
 
 ```bash
-uv run ruff check .
-uv run mypy src
-uv run pytest
+make check
 ```
 
 涉及 Docker 时还应确认：
 
 ```bash
-docker build -t backend:local .
+make docker-local-check
 ```
 
 ## 6. API 变更检查
@@ -133,6 +131,7 @@ docker build -t backend:local .
 - [ ] Docker build 不依赖 `.env`
 - [ ] `.dockerignore` 排除了 `.env`、`.venv/`、缓存、日志和 Git 元数据
 - [ ] `docker-compose.yml` 包含后端应用、PostgreSQL 和 Redis
+- [ ] `make docker-local-check` 使用隔离 Compose 项目，不删除当前开发数据卷
 - [ ] README 本地开发流程仍可执行
 - [ ] 没有额外引入消息队列、Nginx、Kubernetes、staging 或 CD
 
@@ -145,7 +144,9 @@ docker build -t backend:local .
 - [ ] CI 执行 `uv run ruff check .`
 - [ ] CI 执行 `uv run mypy src`
 - [ ] CI 执行 `uv run pytest`
+- [ ] CI 执行 `docker compose config`
 - [ ] CI 执行 `docker build -t backend:ci .`
+- [ ] CI 启动镜像并检查 `/api/v1/health`
 - [ ] CI 不推送 Docker 镜像
 - [ ] CI 不做 staging、production、CD 或 Kubernetes 部署
 - [ ] CI 不依赖本地 `.env` 或真实外部数据库

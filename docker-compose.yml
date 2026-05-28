@@ -7,7 +7,7 @@ services:
         UV_BASE_IMAGE: ${UV_BASE_IMAGE:-ghcr.io/astral-sh/uv:0.11.3}
         PYTHON_BASE_IMAGE: ${PYTHON_BASE_IMAGE:-python:3.11-slim}
     image: ${BACKEND_IMAGE:-backend:local}
-    container_name: backend-api
+    container_name: ${BACKEND_CONTAINER_NAME:-backend-api}
     restart: unless-stopped
     env_file:
       - .env
@@ -15,7 +15,7 @@ services:
       DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/backend
       REDIS_URL: redis://redis:6379/0
     ports:
-      - "8000:8000"
+      - "${BACKEND_PORT:-8000}:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -25,14 +25,14 @@ services:
   # PostgreSQL 数据库服务
   postgres:
     image: postgres:16-alpine
-    container_name: backend-postgres
+    container_name: ${POSTGRES_CONTAINER_NAME:-backend-postgres}
     restart: unless-stopped
     environment:
       POSTGRES_DB: backend
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -44,10 +44,10 @@ services:
   # Redis 缓存服务
   redis:
     image: redis:7-alpine
-    container_name: backend-redis
+    container_name: ${REDIS_CONTAINER_NAME:-backend-redis}
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
     healthcheck:

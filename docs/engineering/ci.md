@@ -32,10 +32,15 @@ uv sync --frozen
 uv run ruff check .
 uv run mypy src
 uv run pytest
+cp .env.example .env
+docker compose config
 docker build -t backend:ci .
+docker run --rm -d --name backend-ci -p 18000:8000 backend:ci
+curl -fsS http://127.0.0.1:18000/api/v1/health
+docker rm -f backend-ci
 ```
 
-当前测试不依赖真实 PostgreSQL，因此基础 CI 暂不启动数据库 service。
+当前单元测试不依赖真实 PostgreSQL；Docker job 会构建镜像并启动后端容器做健康检查，不启动数据库 service。
 
 ## 5. 合并规则
 
@@ -45,6 +50,7 @@ docker build -t backend:ci .
 - mypy
 - pytest
 - Docker build
+- Docker image smoke test
 
 ## 6. 当前不做的事情
 
@@ -61,7 +67,6 @@ docker build -t backend:ci .
 
 后续可以逐步增加：
 
-- 测试覆盖率
 - OpenAPI 导出和 diff 检查
 - Alembic migration 检查
 - Docker 镜像推送
