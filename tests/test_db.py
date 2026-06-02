@@ -1,5 +1,6 @@
 """数据库基础设施测试，验证 ORM 基类和会话依赖生命周期。"""
 
+from collections.abc import Mapping
 from typing import Any
 
 from app.db import session as db_session
@@ -9,7 +10,7 @@ from app.db.base import Base
 def test_base_exposes_sqlalchemy_metadata() -> None:
     """验证声明式基类暴露 SQLAlchemy metadata。"""
     assert Base.metadata is not None
-    assert Base.metadata.tables == {}
+    assert isinstance(Base.metadata.tables, Mapping)
 
 
 def test_get_db_yields_session_and_closes_it(monkeypatch: Any) -> None:

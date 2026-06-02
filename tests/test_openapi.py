@@ -19,4 +19,9 @@ def test_openapi_metadata_and_paths() -> None:
         "version": "0.1.0",
     }
     assert "/api/v1/health" in schema["paths"]
+    assert "/api/v1/auth/register" in schema["paths"]
+    assert "/api/v1/auth/login" in schema["paths"]
+    assert "/api/v1/auth/logout" in schema["paths"]
+    assert "/api/v1/users/me" in schema["paths"]
+    assert "/api/v1/users/me/actions/change-password" in schema["paths"]
     assert "/health" not in schema["paths"]
