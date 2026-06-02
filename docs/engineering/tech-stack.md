@@ -32,7 +32,7 @@
 
 - `.python-version`：声明本地使用 Python 3.11
 - `pyproject.toml`：声明 `requires-python = ">=3.11,<3.12"`
-- `Dockerfile`：使用 `python:3.11-slim`
+- `Dockerfile`：默认使用 `python:3.11-slim`，可通过 `PYTHON_BASE_IMAGE` 覆盖基础镜像源
 
 ## 3. 配置管理约定
 
@@ -137,10 +137,8 @@ migration 文件必须提交到 Git。
 当前本地验证命令：
 
 ```bash
-uv sync
-uv run ruff check .
-uv run mypy src
-uv run pytest
+make install
+make check
 ```
 
 ## 10. Docker 约定
@@ -156,16 +154,20 @@ backend:local
 当前本地构建命令：
 
 ```bash
-docker build -t backend:local .
+make docker-build
 ```
 
 当前本地运行命令：
 
 ```bash
-docker run --rm -p 8000:8000 --env-file .env backend:local
+make docker-up
 ```
 
 Docker 镜像必须使用 Python 3.11 minor 版本。
+
+Dockerfile 使用多阶段构建：构建阶段安装依赖和当前项目包，运行阶段只保留生产虚拟环境。默认基础镜像可以覆盖，但覆盖后的镜像仍必须提供 Python 3.11；生产或发布构建建议使用带 digest 的镜像引用。
+
+本地 Docker 联调检查必须使用 `make docker-local-check`。该命令使用独立 Compose 项目和独立端口，不能删除当前开发环境的数据卷。
 
 ## 11. 新技术引入约定
 

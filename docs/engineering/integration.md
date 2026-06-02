@@ -34,8 +34,8 @@ Docs:     http://localhost:8000/docs
 
 ```bash
 cd /Users/lihai/code/project/backend
-cp .env.example .env
-docker compose up -d --build
+[ -f .env ] || cp .env.example .env
+make docker-up
 ```
 
 该命令会启动：
@@ -47,7 +47,7 @@ docker compose up -d --build
 检查服务健康状态：
 
 ```bash
-curl http://localhost:8000/api/v1/health
+make docker-health
 ```
 
 期望返回：
@@ -66,8 +66,8 @@ curl http://localhost:8000/api/v1/health
 
 ```bash
 cd /Users/lihai/code/project/backend
-uv sync
-cp .env.example .env
+make install
+[ -f .env ] || cp .env.example .env
 docker compose up -d postgres redis
 uv run alembic upgrade head
 uv run uvicorn app.main:app --reload
@@ -199,8 +199,8 @@ http://localhost:5173 -> http://localhost:8000
 接口契约可先通过命令行验证：
 
 ```bash
-curl http://localhost:8000/api/v1/health
-curl http://localhost:8000/openapi.json
+make docker-health
+curl -fsS http://localhost:8000/openapi.json
 ```
 
 如果 curl 正常但浏览器失败，优先检查浏览器控制台是否存在 CORS 报错。
@@ -216,10 +216,9 @@ curl http://localhost:8000/openapi.json
 5. 422 校验错误结构符合前端读取方式
 6. 接口出现在 `/openapi.json`
 7. 新增或更新 pytest 接口测试
-8. 执行 `uv run ruff check .`
-9. 执行 `uv run mypy src`
-10. 执行 `uv run pytest`
-11. 通知前端执行 `pnpm api:types`
+8. 执行 `make check`
+9. 涉及 Docker 时执行 `make docker-local-check`
+10. 通知前端执行 `pnpm api:types`
 
 ## 10. 常见问题
 
