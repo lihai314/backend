@@ -6,6 +6,7 @@ from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
+from app.auth.password import PasswordHashService, password_hash_service
 from app.auth.sessions import RedisSessionStore, session_store
 from app.core.exceptions import UnauthorizedException
 from app.db.session import get_db
@@ -17,6 +18,11 @@ bearer_scheme = HTTPBearer(auto_error=False)
 def get_session_store() -> RedisSessionStore:
     """提供 session store 依赖，方便测试覆盖。"""
     return session_store
+
+
+def get_password_hash_service() -> PasswordHashService:
+    """提供密码哈希服务依赖，方便测试覆盖。"""
+    return password_hash_service
 
 
 def get_bearer_token(
