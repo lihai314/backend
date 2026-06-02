@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/backend"
     redis_url: str = "redis://localhost:6379/0"
+    auth_session_ttl_seconds: int = 60 * 60 * 24 * 7
+    auth_session_key_prefix: str = "auth:session:"
+    auth_session_token_bytes: int = 32
 
     model_config = SettingsConfigDict(
         env_file=".env",

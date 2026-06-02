@@ -6,9 +6,11 @@ readme = "README.md"
 requires-python = ">=3.11,<3.12"
 dependencies = [
     "alembic>=1.13.0",  # 数据库迁移工具
+    "argon2-cffi>=25.1.0",
     "fastapi>=0.115.0",  # Web 框架
     "psycopg[binary]>=3.2.0",  # PostgreSQL 异步驱动
     "pydantic-settings>=2.6.0",  # 配置管理
+    "redis>=8.0.0",
     "sqlalchemy>=2.0.0",  # ORM 框架
     "uvicorn[standard]>=0.30.0",  # ASGI 服务器
 ]

@@ -14,6 +14,7 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 SRC_DIR = ROOT_DIR / "src"
 sys.path.insert(0, str(SRC_DIR))
 
+import app.models  # noqa: F401,E402
 from app.core.config import get_settings  # noqa: E402
 from app.db.base import Base  # noqa: E402
 
